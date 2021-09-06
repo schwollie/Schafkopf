@@ -2,7 +2,7 @@ package source.game.core.gametype;
 
 import source.game.cards.Card;
 import source.game.cards.Color;
-import source.game.core.Board;
+import source.game.core.board.Board;
 import source.game.core.GameManager;
 import source.game.player.Player;
 
@@ -28,12 +28,17 @@ public class NoType extends Gametype{
     }
 
     @Override
-    public int getWinner(Board board) {
-        return 0;
+    public Player getStichWinner(Board board) {
+        return null;
     }
 
     @Override
     public ArrayList<Card> possibleCards(Player player, GameManager g) {
         return null;
+    }
+
+    @Override
+    public Player[] getGameWinner(ArrayList<Player> players) {
+        return new Player[0];
     }
 }

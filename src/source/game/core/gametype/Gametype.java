@@ -2,7 +2,7 @@ package source.game.core.gametype;
 
 import source.game.cards.Card;
 import source.game.cards.Color;
-import source.game.core.Board;
+import source.game.core.board.Board;
 import source.game.core.GameManager;
 import source.game.player.Player;
 
@@ -59,7 +59,9 @@ public abstract class Gametype {
     }
 
     // returns index of winner card
-    public abstract int getWinner(Board board);
+    public abstract Player getStichWinner(Board board);
+
+    public abstract Player[] getGameWinner(ArrayList<Player> players);
 
     public abstract ArrayList<Card> possibleCards(Player player, GameManager g);
 

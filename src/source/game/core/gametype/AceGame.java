@@ -3,25 +3,40 @@ package source.game.core.gametype;
 import source.game.cards.Card;
 import source.game.cards.Cardtype;
 import source.game.cards.Color;
-import source.game.core.Board;
+import source.game.core.board.Board;
 import source.game.core.GameManager;
-import source.game.core.rules.RuleSet;
+import source.game.core.rules.Rule;
+import source.game.core.rules.Rulset;
 import source.game.player.Player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class AceGame extends Gametype {
 
     public static final int value = 2;
 
     public Player player; // Player who plays the ace game
+    public Player player2; // Player who has the ace
     public Color color; // color of the ace to play with
 
-    public RuleSet ruleSet;
+    public Rulset ruleSet;
 
     public AceGame(Player p, Color c) {
         this.color = c;
         this.player = p;
+        createRuleset();
+        this.player2 = getPlayer2();
+    }
+
+    private Player getPlayer2() {
+        Player[] players = this.player.getGame().getInfo().getPlayers();
+        for (Player p : players) {
+            if (p.hasCard(Cardtype.Ace, this.color)!=-1) {
+                return p;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -38,15 +53,13 @@ public class AceGame extends Gametype {
     public int getCardVal(Card card) {
         int trumpfVal = 0;
 
-        // falls trumpf ohne ober unter
-        if (card.getColor().equals(Color.Hearts)&&
-                (!card.getType().equals(Cardtype.Ober)&&!card.getType().equals(Cardtype.Unter))) {
-            trumpfVal = 50;
+        if (isTrumpf(card)) {
+            trumpfVal = 1000;
         }
 
         switch (card.getType()) {
-            case Ober -> trumpfVal = 200;
-            case Unter -> trumpfVal = 100;
+            case Ober -> trumpfVal += 200;
+            case Unter -> trumpfVal += 100;
         }
 
         return card.getValue()/4 + trumpfVal + card.getColor().value*4;
@@ -77,6 +90,21 @@ public class AceGame extends Gametype {
         return hasSameColor;
     }
 
+    private void createRuleset() {
+        Rulset r = new Rulset(this);
+        r.setCol2col(true);
+        r.setExcludeTrunpf(true);
+        r.setTrumpf2trumpf(true);
+
+        ArrayList<Card> from = Rule.getAllCards(this, this.color, false);
+        ArrayList<Card> to = new ArrayList<Card>(Arrays.stream(new Card[] {new Card(Cardtype.Ace, this.color)}).toList());
+        Rule rule = new Rule(this, from, to);
+
+        r.addRule(rule);
+
+        this.ruleSet = r;
+    }
+
     @Override
     public boolean isTrumpf(Card c) {
         if (c.getType().equals(Cardtype.Unter) || c.getType().equals(Cardtype.Ober) || c.getColor().equals(Color.Hearts)) {
@@ -86,35 +114,48 @@ public class AceGame extends Gametype {
     }
 
     @Override
-    public int getWinner(Board board) {
-        return 0;
+    public Player getStichWinner(Board board) {
+        ArrayList<Card> cards = board.getCards();
+        cards = Card.sort(cards, this);
+
+        if (isTrumpf(cards.get(3))) {
+            return board.getPlayerFromCard(cards.get(3));
+        }
+
+        for (int i = 3; i >= 0; i--) {
+            if (board.getFirst().getColor().equals(cards.get(i).getColor())) {
+                return board.getPlayerFromCard(cards.get(i));
+            }
+        }
+
+        throw new Error("must not reach this point");
+    }
+
+    @Override
+    public Player[] getGameWinner(ArrayList<Player> players) {
+        ArrayList<Player> winners = new ArrayList<>(players);
+
+        int playerPoints = 0;
+
+        for (Player p : players) {
+            if (p == this.player || p == this.player2) {
+                playerPoints += p.getPoints();
+            }
+        }
+
+        if (playerPoints > 61) {
+            return new Player[] { player, player2};
+        }
+
+        winners.remove(player2); winners.remove(player);
+
+        return (Player[])winners.toArray();
     }
 
     // returns all cards that are possible to play
     @Override
     public ArrayList<Card> possibleCards(Player player, GameManager g) {
-
-        Card first = g.getBoard().getFirst();
-        boolean isTrumpf = false;
-
-        ArrayList<Card> possCards = new ArrayList<>();
-
-        if (first.equals(null)) {
-            return player.getCards();
-        }
-
-        isTrumpf = this.isTrumpf(first);
-
-        for (Card c : player.getCards()) {
-
-
-            if (isTrumpf && this.isTrumpf(c)) {
-                possCards.add(c);
-            } else if (!isTrumpf && first.getColor().equals(c.getColor())) {
-                possCards.add(c);
-            }
-        }
-
-        return possCards.size() == 0 ?
+        if (g.getBoard().getFirst()==null) {return player.getCards();}
+        return ruleSet.getPossibleCards(player, g.getBoard());
     }
 }

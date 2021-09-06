@@ -1,5 +1,6 @@
 package source.game.core;
 
+import source.game.core.board.Board;
 import source.game.core.gametype.Gametype;
 import source.game.player.Player;
 
@@ -21,6 +22,10 @@ public class GameInfo {
 
     public Player getLastWinnner() {
         return lastWin;
+    }
+
+    public void setLastWin(Player lastWin) {
+        this.lastWin = lastWin;
     }
 
     public Player getCurrentPlayer() {
@@ -45,5 +50,9 @@ public class GameInfo {
 
     public void increaseRound() {
         round++;
+    }
+
+    public Player[] getPlayers() {
+        return game.players;
     }
 }

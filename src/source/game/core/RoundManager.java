@@ -36,8 +36,29 @@ public class RoundManager {
             game.info.setCurrentPlayer(game.players[playerIndex]);
             game.sendChangeInfo();
             game.players[playerIndex].playRound(game);
+            game.sendChangeInfo();
+
+            /*
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {}
+
+             */
+
             playerIndex = (playerIndex+1) % 4;
         }
+
+        Player winner = game.info.gametype.getStichWinner(game.board);
+        winner.addStich(game.board);
+        game.getInfo().setLastWin(winner);
+
+        System.out.println("Winner is " + winner);
+
+        /*
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {}
+        */
 
         game.info.increaseRound();
     }

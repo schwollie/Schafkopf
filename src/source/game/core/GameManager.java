@@ -1,6 +1,7 @@
 package source.game.core;
 
 import source.game.GameChangeListener;
+import source.game.core.board.Board;
 import source.game.core.gametype.AceGame;
 import source.game.player.HumanPlayer;
 import source.game.player.Player;
@@ -9,6 +10,7 @@ import source.game.stack.Stack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class GameManager {
 
@@ -41,6 +43,8 @@ public class GameManager {
             r.nextRound();
             board.clear();
         }
+
+        info.getGametype().getGameWinner(new ArrayList<Player>((List<Player>) Arrays.asList(players)));
     }
 
     void createPlayers(int num) {

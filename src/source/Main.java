@@ -6,7 +6,7 @@ import source.game.core.GameManager;
 public class Main {
 
     public static void main(String[] args) {
-        GameManager g = new GameManager(1);
+        GameManager g = new GameManager(0);
         VisualManager v = new VisualManager();
 
         v.start(g);

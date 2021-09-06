@@ -1,7 +1,8 @@
 package source.game.player;
 
+import source.game.cards.Cardtype;
 import source.game.cards.Color;
-import source.game.core.Board;
+import source.game.core.board.Board;
 import source.game.core.GameManager;
 import source.game.cards.Card;
 import source.game.core.gametype.Gametype;
@@ -32,7 +33,7 @@ public abstract class Player {
     }
 
     protected void layCard(Card c) {
-        game.getBoard().layCard(c);
+        game.getBoard().layCard(c, this);
         this.cards.remove(c);
     }
 
@@ -52,6 +53,14 @@ public abstract class Player {
         return stiche;
     }
 
+    public int getPoints() {
+        int val = 0;
+        for (Card c : stiche) {
+            val += c.getValue();
+        }
+        return val;
+    }
+
     public int getCardCount(Color c) {
         int i = 0;
         for (Card card : cards) {
@@ -60,5 +69,20 @@ public abstract class Player {
             }
         }
         return i;
+    }
+
+    public int hasCard(Cardtype cardtype, Color col) {
+        int i = 0;
+        for (Card c : cards) {
+            if (c.getColor().equals(col) && c.getType().equals(cardtype)) {
+                return i;
+            }
+            i++;
+        }
+        return -1;
+    }
+
+    public GameManager getGame() {
+        return game;
     }
 }
