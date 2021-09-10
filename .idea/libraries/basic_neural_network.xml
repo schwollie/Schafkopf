@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="basic_neural_network">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../basic_neural_network/out/artifacts/basic_neural_network_jar/basic_neural_network.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
