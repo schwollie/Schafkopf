@@ -34,7 +34,7 @@ public class ThreadedHelper extends Thread{
 
             for (int i = 0; i < agents.size(); i+=4) {
 
-                GameManager gameManager = new GameManager(0, 4);
+                GameManager gameManager = new GameManager(0, 4, 0);
                 for (int a = 0; a < 4; a++) {
                     agents.get(i+a).setupAgent(gameManager.getAgents().get(a));
                 }

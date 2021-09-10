@@ -6,10 +6,7 @@ import source.game.core.board.Board;
 import source.game.core.gametype.AceGame;
 import source.game.core.gametype.Gametype;
 import source.game.core.gametype.NoType;
-import source.game.player.AgentPlayer;
-import source.game.player.HumanPlayer;
-import source.game.player.Player;
-import source.game.player.RandomPlayer;
+import source.game.player.*;
 import source.game.stack.Stack;
 
 import java.util.ArrayList;
@@ -24,24 +21,25 @@ public class GameManager {
     final Board board = new Board();
     RoundManager r = new RoundManager(this);
 
-    int humanPlayers, aiPlayers;
+    int humanPlayers, aiPlayers, trainPlayers;
 
-    public GameManager(int humanPlayers, int aiPlayers) {
+    public GameManager(int humanPlayers, int aiPlayers, int trainPlayers) {
         this.humanPlayers = humanPlayers;
         this.aiPlayers = aiPlayers;
-        init(humanPlayers, aiPlayers);
+        this.trainPlayers = trainPlayers;
+        init(humanPlayers, aiPlayers, trainPlayers);
     }
 
-    private void init(int humans, int ais) {
+    private void init(int humans, int ais, int train) {
         stack.init();
-        createPlayers(humans, ais);
+        createPlayers(humans, ais, train);
         this.info = new GameInfo(this);
     }
 
     public Gametype decideGameType() {
         info.setGametype(r.decideGameType());
         while (info.getGametype() instanceof NoType) { // notype does not work
-            init(humanPlayers, aiPlayers);
+            init(humanPlayers, aiPlayers, trainPlayers);
             info.setGametype(r.decideGameType());
         }
         return info.getGametype();
@@ -69,12 +67,18 @@ public class GameManager {
         }
     }
 
-    void createPlayers(int num, int numAI) {
+    void createPlayers(int num, int numAI, int trainNum) {
+        int human = 0, ai = 0, train = 0;
         for (int i = 0; i < 4; i++) {
-            if (i < num) {
+            if (human < num) {
                 players[i] = new HumanPlayer(this, "HumanPlayer " + i);
-            } else if (i < numAI) {
+                human++;
+            } else if (ai < numAI) {
                 players[i] = new AgentPlayer(this, "AgentPlayer " + i);
+                ai++;
+            } else if (train < trainNum){
+                players[i] = new TrainAgentPlayer(this, "Train " + i);
+                train++;
             } else {
                 players[i] = new RandomPlayer(this, "RandomPlayer " + i);
             }
@@ -125,6 +129,16 @@ public class GameManager {
         ArrayList<AgentPlayer> agents = new ArrayList<>();
         for (Player p : players) {
             if (p instanceof AgentPlayer ap) {
+                agents.add(ap);
+            }
+        }
+        return agents;
+    }
+
+    public ArrayList<TrainAgentPlayer> getTrainAgents() {
+        ArrayList<TrainAgentPlayer> agents = new ArrayList<>();
+        for (Player p : players) {
+            if (p instanceof TrainAgentPlayer ap) {
                 agents.add(ap);
             }
         }

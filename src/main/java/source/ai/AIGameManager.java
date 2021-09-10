@@ -12,10 +12,13 @@ public class AIGameManager {
     }
 
     public static NeuralNetwork getDefaultNet() {
-        return new NeuralNetwork(37, 2, 10, 32);
+        return new NeuralNetwork(37, 4, 10, 32);
     }
 
     public void trainAgents() {
+        NeuralNetwork start = evm.preTrain(50000);
+        evm.setStartNetwork(start);
+        //System.out.println("go on");
         for (int gen = 0; gen < 100000; gen++) {
             if (Settings.verbose_AI>0) {
                 System.out.println("train generation " + gen);

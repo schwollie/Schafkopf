@@ -1,5 +1,6 @@
 package source.ai;
 
+import basicneuralnetwork.NeuralNetwork;
 import source.Logic;
 import source.Settings;
 import source.game.core.GameManager;
@@ -11,12 +12,12 @@ import java.util.Random;
 
 public class EvolutionManager {
 
-    public static final int games_per_agent = 500;
-    public static final int test_game_count = 1000;
+    public static final int games_per_agent = 1000;
+    public static final int test_game_count = 10000;
 
-    public static final double crossover = 0.17;
-    public static final double mutatePropability = 0.1;
-    public static final double mutateStrength = 0.1;
+    public static final double crossover = 0.15;
+    public static final double mutatePropability = 0.2;
+    public static final double mutateStrength = 0.3;
 
     ArrayList<EvolutionAgent> agents = new ArrayList<>();
 
@@ -25,6 +26,16 @@ public class EvolutionManager {
         for (int i = 0; i<numAgents; i++) {
             agents.add(new EvolutionAgent());
         }
+    }
+
+    public NeuralNetwork preTrain(int x) {
+        NeuralNetwork nn = AIGameManager.getDefaultNet();
+        for (int i = 0; i < x; i++) {
+            GameManager manager = new GameManager(0,0,1);
+            manager.getTrainAgents().get(0).setNeuralNetwork(nn);
+            manager.startGame();
+        }
+        return nn;
     }
 
     public void calcFitnessThreaded() {
@@ -67,17 +78,17 @@ public class EvolutionManager {
                 System.out.println("Game " + g);
             }
 
-            for (int i = 0; i < agents.size(); i+=4) {
+            for (int i = 0; i < agents.size(); i++) {
 
-                GameManager gameManager = new GameManager(0, 4);
-                for (int a = 0; a < 4; a++) {
+                GameManager gameManager = new GameManager(0, 1, 0);
+                for (int a = 0; a < 1; a++) {
                     agents.get(i+a).setupAgent(gameManager.getAgents().get(a));
                 }
 
                 gameManager.startGame();
 
                 // determine fitness
-                for (int a = 0; a < 4; a++) {
+                for (int a = 0; a < 1; a++) {
                     agents.get(i+a).setFitness(gameManager);
                 }
             }
@@ -101,12 +112,12 @@ public class EvolutionManager {
         highest.fitness = 0;
 
         for (int i = 0; i < test_game_count; i++) {
-            GameManager gameManager = new GameManager(0, 1);
+            GameManager gameManager = new GameManager(0, 1, 0);
             lowest.setupAgent(gameManager.getAgents().get(0));
             gameManager.startGame();
             lowest.setFitness(gameManager);
 
-            GameManager gameManager2 = new GameManager(0, 1);
+            GameManager gameManager2 = new GameManager(0, 1, 0);
             highest.setupAgent(gameManager2.getAgents().get(0));
             gameManager2.startGame();
             highest.setFitness(gameManager2);
@@ -134,7 +145,7 @@ public class EvolutionManager {
         for (EvolutionAgent agent : agents) {
 
             if ((float)index/agents.size()>1-crossover) {
-                newAgents.add(new EvolutionAgent(pre.network.merge(agent.network)));
+                newAgents.add(new EvolutionAgent(pre.network.copy().merge(agent.network.copy())));
             }
 
             if (rnd.nextInt(1000)<= mutatePropability*1000) {
@@ -146,9 +157,14 @@ public class EvolutionManager {
         }
 
         for (int i = 0; i< newAgents.size(); i++) {
-            agents.get(i).network = newAgents.get(i).network;
+            agents.get(i).network = newAgents.get(i).network.copy();
         }
 
     }
 
+    public void setStartNetwork(NeuralNetwork start) {
+        for (EvolutionAgent agent : agents) {
+            agent.network = start.copy();
+        }
+    }
 }

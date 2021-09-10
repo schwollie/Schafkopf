@@ -1,5 +1,6 @@
 package source.game.core.board;
 
+import source.Settings;
 import source.game.cards.Card;
 import source.game.player.Player;
 
@@ -12,6 +13,9 @@ public class Board {
     final ArrayList<Card> cards = new ArrayList<>();
 
     public void clear() {
+        if (Settings.verbose>1) {
+            System.out.println("board: " + this.cards);
+        }
         cards.clear();
         players.clear();
     }

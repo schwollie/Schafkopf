@@ -13,7 +13,7 @@ public class Main {
     }
 
     private static void normalGame() {
-        GameManager g = new GameManager(0, 4);
+        GameManager g = new GameManager(1, 3,   0);
         VisualManager v = new VisualManager();
 
         v.start(g);

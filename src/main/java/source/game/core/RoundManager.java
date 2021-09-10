@@ -38,12 +38,12 @@ public class RoundManager {
 
             game.sendChangeInfo();
 
-            /*
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {}
 
-             */
+            //try {
+            //    Thread.sleep(2000);
+            //} catch (InterruptedException e) {}
+
+
         }
 
         Player winner = game.info.gametype.getStichWinner(game.board);
@@ -54,11 +54,11 @@ public class RoundManager {
             System.out.println("Round winner is " + winner);
         }
 
-        /*
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {}
-        */
+
+        //try {
+        //    Thread.sleep(2000);
+        //} catch (InterruptedException e) {}
+
 
         game.info.increaseRound();
     }
